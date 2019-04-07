@@ -18,8 +18,6 @@ public class FacebookDB implements DBOperations
 	private final String USER_NAME = "root";
 	private final String PASSWORD = "password";
    
-   FacebookDB fbDb = new FacebookDB();
-   
    private Connection conn;
    
    // Constructor
@@ -88,10 +86,62 @@ public class FacebookDB implements DBOperations
 				System.out.println("Could not close connection.\n" + e.getMessage());
 			}
    }
-   
-   public void insertIntoDatabase()
+   //Part 2
+   public void insertIntoDatabase(String sqlString)
    {
+		createConnection(DB_URL);  
+		try{ 
+   	   Statement statement = conn.createStatement(); //Creates statement object
+   		System.out.println("Object has successfully been created");
+			try{
+            statement.executeUpdate("USE facebook"); //User the facebook database
+            statement.executeUpdate(sqlString); //Executes the sql query in the database
+            System.out.println("Statement executed successfully");
+			}
+			catch(SQLException e){
+				System.out.println("Problem with SQL.\n" + e.getMessage());
+			}
+		}
+		catch(SQLException e){
+			System.out.println("Problem with SQL.\n" + e.getMessage());
+		}
+		closeConnection();  // Closes connection
+	}   
+   //Part 4
+   public String getUserPasswordFromDatabase(String emailAddress)
+   {
+      String sql = "SELECT * FROM user WHERE emailaddress = '"+emailAddress+"'"; //Sql query to be executed in database
+      String password = "";
+      ResultSet result = null;
+          
+	   createConnection(DB_URL);
+      try{
+   	   Statement statement = conn.createStatement(); //Creates statement object
+   		System.out.println("Object has successfully been created");
+   		try{
+            statement.executeUpdate("USE facebook"); //User the facebook database
+            result = statement.executeQuery(sql); //Executes the sql query in the database
+            System.out.println("Statement executed successfully");
+         }
+         catch(SQLException e){
+   				System.out.println("Problem with SQL.\n" + e.getMessage());   
+   		}
+   	}
+   	catch(SQLException e){
+   			System.out.println("Problem with SQL.\n" + e.getMessage());
+   		}
       
+      try{
+			while(result.next()){
+				password = result.getString("password");
+			}
+		}
+   		catch(SQLException e){
+   			System.out.println("Problem with SQL.\n" + e.getMessage());
+   		}
+     		
+   		closeConnection(); //Closes connection 
+   		return password; //returns password
    }
 
 }
